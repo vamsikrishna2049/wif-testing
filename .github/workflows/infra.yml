@@ -1,0 +1,37 @@
+name: Terraform Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Authenticate to GCP
+      uses: google-github-actions/auth@v2
+      with:
+        project_id: gcplearning-15042026
+        workload_identity_provider: projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/github-pool/providers/github
+        service_account: terraform-sa@gcplearning-15042026.iam.gserviceaccount.com
+
+    - uses: hashicorp/setup-terraform@v3
+
+    - name: Terraform Init
+      run: terraform init
+      working-directory: infra
+
+    - name: Terraform Plan
+      run: terraform plan
+      working-directory: infra
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
+      working-directory: infra

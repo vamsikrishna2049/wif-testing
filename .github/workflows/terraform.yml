@@ -1,0 +1,51 @@
+name: 'Terraform'
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    environment: production
+
+    # Use the GitHub OIDC provider to authenticate with GCP
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    defaults:
+      run:
+        working-directory: gcp-wif-terraform/infra
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Authenticate with GCP using WIF
+    - id: 'auth'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        workload_identity_provider: 'projects/177707171764/locations/global/workloadIdentityPools/github-pool-2/providers/github'
+        service_account: 'terraform-sa@gcplearning-15042026.iam.gserviceaccount.com'
+
+    # Set up gcloud
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v2'
+
+    # Initialize Terraform
+    - name: Terraform Init
+      run: terraform init
+
+    # Plan Terraform changes
+    - name: Terraform Plan
+      run: terraform plan
+
+    # Apply Terraform changes on main branch pushes
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform apply -auto-approve
