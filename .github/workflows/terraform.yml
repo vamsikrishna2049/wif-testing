@@ -1,55 +1,80 @@
 name: Terraform
 
 on:
- push:
-   branches:
-    - main
+  push:
+    branches:
+      - main
 
 permissions:
- contents: read
- id-token: write
+  contents: read
+  id-token: write
 
 concurrency:
- group: terraform-prod
- cancel-in-progress: false
+  group: terraform-prod
+  cancel-in-progress: false
 
 jobs:
+  terraform:
 
- terraform:
+    runs-on: ubuntu-latest
 
-   runs-on: ubuntu-latest
+    environment: production
 
-   environment: production
+    defaults:
+      run:
+        working-directory: gcp-wif-terraform
 
-   defaults:
-     run:
-       working-directory: gcp-wif-terraform
+    env:
+      TF_IN_AUTOMATION: true
 
-   env:
-     TF_IN_AUTOMATION: true
+    steps:
 
-   steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-   - uses: actions/checkout@v4
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.5
 
-   - uses: hashicorp/setup-terraform@v3
-     with:
-      terraform_version: 1.8.5
+      #####################################
+      # Authenticate via Workload Identity Federation
+      #####################################
 
-   - uses: google-github-actions/auth@v2
-     with:
-      workload_identity_provider: projects/177707171764/locations/global/workloadIdentityPools/github-pool-10/providers/github
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/177707171764/locations/global/workloadIdentityPools/github-pool-prod-12/providers/github
 
-      service_account: terraform-sa@gcplearning-15042026.iam.gserviceaccount.com
+          service_account: terraform-sa@gcplearning-15042026.iam.gserviceaccount.com
 
-      token_format: access_token
+          token_format: access_token
 
-   - uses: google-github-actions/setup-gcloud@v2
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
 
-   - run: terraform init
+      #####################################
+      # PROVE WIF AUTH WORKS
+      #####################################
 
-   - run: terraform validate
+      - name: Verify authenticated identity
+        run: gcloud auth list
 
-   - run: terraform plan -input=false
+      - name: Verify access via WIF
+        run: gcloud projects describe gcplearning-15042026
 
-   - run: terraform apply -auto-approve -input=false
+      #####################################
+      # Terraform
+      #####################################
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -input=false
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -input=false
