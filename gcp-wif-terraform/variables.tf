@@ -1,15 +1,25 @@
 variable "project_id" {
-  description = "GCP Project ID"
-  type        = string
+
+  description = "GCP project ID"
+
+  type = string
+
 }
 
 variable "region" {
-  description = "GCP Region"
-  type        = string
-  default     = "us-central1"
+
+  description = "GCP region"
+
+  type = string
+
+  default = "us-central1"
+
 }
 
 variable "github_repo" {
-  description = "GitHub repository in format org/repo"
-  type        = string
+
+  description = "GitHub repository org/repo"
+
+  type = string
+
 }

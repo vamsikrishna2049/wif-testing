@@ -1,15 +1,33 @@
 terraform {
+
   required_version = ">= 1.6.0"
 
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = "~> 7.28"
-    }
+  backend "gcs" {
+
+    bucket = "gcplearning-15042026-tf-state"
+
+    prefix = "wif/bootstrap"
+
   }
+
+  required_providers {
+
+    google = {
+
+      source = "hashicorp/google"
+
+      version = "~> 7.0"
+
+    }
+
+  }
+
 }
 
 provider "google" {
+
   project = var.project_id
-  region  = var.region
+
+  region = var.region
+
 }
