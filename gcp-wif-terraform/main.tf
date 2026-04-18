@@ -30,7 +30,7 @@ resource "google_service_account" "github_actions" {
 
 resource "google_iam_workload_identity_pool" "github_pool" {
 
-  workload_identity_pool_id = "github-pool-prod-1"
+  workload_identity_pool_id = var.workload_identity_pool_id
 
   display_name = "GitHub OIDC Pool"
 
