@@ -21,7 +21,7 @@ resource "google_iam_workload_identity_pool" "github_pool" {
 
   project = var.project_id
 
-  workload_identity_pool_id = "github-pool-0"
+  workload_identity_pool_id = var.workload_identity_pool_id
 
   display_name = "GitHub Pool"
 
