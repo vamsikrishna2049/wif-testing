@@ -16,7 +16,7 @@ resource "google_project_service" "apis" {
 
 # Workload Identity Pool
 resource "google_iam_workload_identity_pool" "github_pool" {
-  workload_identity_pool_id = "github-pool-2"
+  workload_identity_pool_id = "github-pool-0"
   display_name              = "GitHub Pool"
 }
 
