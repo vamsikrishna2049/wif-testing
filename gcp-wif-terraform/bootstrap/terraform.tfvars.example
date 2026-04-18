@@ -1,6 +1,0 @@
-# Configuration Example
-# Copy this file to terraform.tfvars and fill in your values
-
-project_id = "your-gcp-project-id"
-github_repo = "your-github-org/your-github-repo"
-region = "us-central1"
